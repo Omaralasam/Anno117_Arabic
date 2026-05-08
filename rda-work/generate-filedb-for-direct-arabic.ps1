@@ -13,6 +13,23 @@ $directRda = Join-Path $workspace "rda-work\anno117-direct-arabic\data99.rda"
 $outputFileDb = Join-Path $workspace "rda-work\anno117-direct-arabic\file.db"
 $outputChecksumDb = Join-Path $workspace "rda-work\anno117-direct-arabic\checksum.db"
 
+function Unblock-LocalToolFiles([string]$Path) {
+    if (-not (Get-Command Unblock-File -ErrorAction SilentlyContinue)) {
+        return
+    }
+
+    foreach ($file in @(Get-ChildItem -LiteralPath $Path -Recurse -File -ErrorAction SilentlyContinue)) {
+        try {
+            Unblock-File -LiteralPath $file.FullName -ErrorAction SilentlyContinue
+        }
+        catch {
+            # Some file systems do not support zone metadata.
+        }
+    }
+}
+
+Unblock-LocalToolFiles $toolRoot
+
 [Reflection.Assembly]::LoadFrom((Join-Path $toolRoot "AnnoRDA.dll")) | Out-Null
 [Reflection.Assembly]::LoadFrom((Join-Path $toolRoot "AnnoRDA.FileDB.dll")) | Out-Null
 [Reflection.Assembly]::LoadFrom((Join-Path $toolRoot "AnnoRDA.ChecksumDB.dll")) | Out-Null

@@ -7,7 +7,7 @@
 
 حمّل النسخة الجاهزة من هنا:
 
-[Anno117_Arabic_v1.0.1.zip](https://github.com/Omaralasam/Anno117_Arabic/releases/download/v1.0.1/Anno117_Arabic_v1.0.1.zip)
+[Anno117_Arabic_v1.0.2.zip](https://github.com/Omaralasam/Anno117_Arabic/releases/download/v1.0.2/Anno117_Arabic_v1.0.2.zip)
 
 ## التحميل والتشغيل
 

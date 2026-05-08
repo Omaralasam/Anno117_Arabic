@@ -14,6 +14,23 @@ $payload = Join-Path $PSScriptRoot "anno117-direct-arabic\payload"
 $mergedPayload = Join-Path $PSScriptRoot "merged-file-browse-patterns-payload"
 $directRda = Join-Path $PSScriptRoot "anno117-direct-arabic\data99.rda"
 
+function Unblock-LocalToolFiles([string]$Path) {
+    if (-not (Get-Command Unblock-File -ErrorAction SilentlyContinue)) {
+        return
+    }
+
+    foreach ($file in @(Get-ChildItem -LiteralPath $Path -Recurse -File -ErrorAction SilentlyContinue)) {
+        try {
+            Unblock-File -LiteralPath $file.FullName -ErrorAction SilentlyContinue
+        }
+        catch {
+            # Some file systems do not support zone metadata.
+        }
+    }
+}
+
+Unblock-LocalToolFiles $toolRoot
+
 foreach ($dll in @("AnnoRDA.dll", "AnnoRDA.FileDB.dll", "AnnoRDA.ChecksumDB.dll", "RDAExplorer.dll")) {
     [Reflection.Assembly]::LoadFrom((Join-Path $toolRoot $dll)) | Out-Null
 }
