@@ -9,9 +9,13 @@ desktop-dist/
 dist/
 build/
 
-# Local work files, generated game archives, and backups
+# Generated game archives and backups
 backups/
-rda-work/
+rda-work/anno117-direct-arabic/checksum.db
+rda-work/anno117-direct-arabic/data99.rda
+rda-work/anno117-direct-arabic/file.db
+rda-work/existing-slot-arabic/
+rda-work/merged-file-browse-patterns-payload/
 
 # OS/editor noise
 Thumbs.db

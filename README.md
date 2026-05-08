@@ -7,20 +7,21 @@
 
 حمّل النسخة الجاهزة من هنا:
 
-[Anno117_Arabic_v1.0.0.zip](https://github.com/Omaralasam/Anno117_Arabic/releases/download/v1.0.0/Anno117_Arabic_v1.0.0.zip)
+[Anno117_Arabic_v1.0.1.zip](https://github.com/Omaralasam/Anno117_Arabic/releases/download/v1.0.1/Anno117_Arabic_v1.0.1.zip)
 
 ## التحميل والتشغيل
 
 1. حمّل النسخة الجاهزة من صفحة الإصدارات في GitHub.
 2. فك الضغط في أي مجلد مناسب.
-3. شغّل:
+3. أغلق اللعبة و Ubisoft Connect بالكامل قبل التثبيت.
+4. شغّل:
 
 ```text
 Anno117ArabicManager.exe
 ```
 
-4. اضغط **فحص سريع** للتأكد من أن مسار اللعبة والملفات المطلوبة سليمة.
-5. اضغط **جهز وثبت التعريب**.
+5. اضغط **فحص سريع** للتأكد من أن مسار اللعبة والملفات المطلوبة سليمة.
+6. اضغط **جهز وثبت التعريب**.
 
 ## إذا لم يتم العثور على مسار اللعبة
 

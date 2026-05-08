@@ -1,0 +1,68 @@
+$ErrorActionPreference = "Stop"
+
+$workspace = if ($env:ANNO117_ARABIC_WORKSPACE) { $env:ANNO117_ARABIC_WORKSPACE } else { "C:\Users\Omar-alasam009\Documents\Codex\2026-04-20-rda" }
+$toolRoot = Join-Path $workspace "tools\RDAExplorer"
+$maindata = if ($env:ANNO117_GAME_MAINDATA) {
+    $env:ANNO117_GAME_MAINDATA
+} elseif ($env:ANNO117_GAME_ROOT) {
+    Join-Path $env:ANNO117_GAME_ROOT "maindata"
+} else {
+    "D:\SteamLibrary\steamapps\common\Anno 117 - Pax Romana\maindata"
+}
+$directRda = Join-Path $workspace "rda-work\anno117-direct-arabic\data99.rda"
+$outputFileDb = Join-Path $workspace "rda-work\anno117-direct-arabic\file.db"
+$outputChecksumDb = Join-Path $workspace "rda-work\anno117-direct-arabic\checksum.db"
+
+[Reflection.Assembly]::LoadFrom((Join-Path $toolRoot "AnnoRDA.dll")) | Out-Null
+[Reflection.Assembly]::LoadFrom((Join-Path $toolRoot "AnnoRDA.FileDB.dll")) | Out-Null
+[Reflection.Assembly]::LoadFrom((Join-Path $toolRoot "AnnoRDA.ChecksumDB.dll")) | Out-Null
+
+if (-not (Test-Path -LiteralPath $directRda)) {
+    throw "Missing direct Arabic RDA: $directRda"
+}
+
+$rdaPaths = New-Object System.Collections.Generic.List[string]
+foreach ($file in Get-ChildItem -LiteralPath $maindata -Filter "*.rda" -File) {
+    [void]$rdaPaths.Add($file.FullName)
+}
+$sortedPaths = @([AnnoRDA.Loader.ContainerDirectoryLoader]::SortContainerPaths($rdaPaths))
+# Anno 117 archives are named by feature (config.rda, ui.rda, ...), so data99.rda
+# sorts before them alphabetically. Load the Arabic override archive last.
+$sortedPaths = @($sortedPaths + $directRda)
+
+$archiveFiles = New-Object AnnoRDA.FileDB.Writer.ArchiveFileMap
+$fileSystem = New-Object AnnoRDA.FileSystem
+$fileLoader = New-Object AnnoRDA.Loader.ContainerFileLoader
+
+foreach ($path in $sortedPaths) {
+    $name = [System.IO.Path]::GetFileName($path)
+    Write-Host "Loading $name"
+    $archiveFiles.Add($path, $name)
+    $containerFileSystem = $fileLoader.Load($path)
+    $fileSystem.OverwriteWith($containerFileSystem, $null, [System.Threading.CancellationToken]::None)
+}
+
+Write-Host "Writing file.db"
+$fileDbStream = [System.IO.File]::Open($outputFileDb, [System.IO.FileMode]::Create, [System.IO.FileAccess]::ReadWrite)
+try {
+    $fileDbWriter = New-Object AnnoRDA.FileDB.Writer.FileSystemWriter($fileDbStream, $true)
+    $fileDbWriter.WriteFileSystem($fileSystem, $archiveFiles)
+
+    Write-Host "Writing checksum.db"
+    $fileDbStream.Position = 0
+    $checksum = [AnnoRDA.ChecksumDB.Generator]::ComputeChecksum($fileDbStream)
+}
+finally {
+    $fileDbStream.Dispose()
+}
+
+$checksumDbStream = [System.IO.File]::Open($outputChecksumDb, [System.IO.FileMode]::Create, [System.IO.FileAccess]::Write)
+try {
+    $checksumDbWriter = New-Object System.IO.BinaryWriter($checksumDbStream)
+    $checksumDbWriter.Write($checksum)
+}
+finally {
+    $checksumDbStream.Dispose()
+}
+
+Get-Item -LiteralPath $outputFileDb, $outputChecksumDb | Select-Object FullName,Length,LastWriteTime
