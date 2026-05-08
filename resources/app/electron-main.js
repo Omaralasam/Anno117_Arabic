@@ -111,8 +111,28 @@ function findGameRoot() {
   return candidates[0] || 'D:\\SteamLibrary\\steamapps\\common\\Anno 117 - Pax Romana';
 }
 
-const GAME_ROOT = findGameRoot();
-const MAINDATA = process.env.ANNO117_GAME_MAINDATA || path.join(GAME_ROOT, 'maindata');
+function resolveMaindata(gameRoot) {
+  return process.env.ANNO117_GAME_MAINDATA || path.join(gameRoot, 'maindata');
+}
+
+function normalizeGameRoot(selectedPath) {
+  const resolved = path.resolve(selectedPath);
+  return path.basename(resolved).toLowerCase() === 'maindata'
+    ? path.dirname(resolved)
+    : resolved;
+}
+
+function getGamePathConfigTarget() {
+  return path.join(WORKSPACE, 'game-path.txt');
+}
+
+function setGameRoot(gameRoot, maindata) {
+  GAME_ROOT = gameRoot;
+  MAINDATA = maindata || resolveMaindata(GAME_ROOT);
+}
+
+let GAME_ROOT = findGameRoot();
+let MAINDATA = resolveMaindata(GAME_ROOT);
 const PATHS = {
   buildMerged: path.join(WORKSPACE, 'rda-work', 'build_merged_existing_slot_rda.ps1'),
   generateDb: path.join(WORKSPACE, 'rda-work', 'generate-filedb-for-direct-arabic.ps1'),
@@ -428,6 +448,41 @@ ipcMain.handle('manager:build', async (event) => runWorkflow(event, ['build']));
 ipcMain.handle('manager:install', async (event) => runWorkflow(event, ['install']));
 ipcMain.handle('manager:buildAndInstall', async (event) => runWorkflow(event, ['build', 'install']));
 ipcMain.handle('manager:restore', async (event) => runWorkflow(event, ['restore']));
+
+ipcMain.handle('manager:chooseGameFolder', async () => {
+  const result = await dialog.showOpenDialog(mainWindow, {
+    title: 'اختر مجلد لعبة Anno 117',
+    properties: ['openDirectory']
+  });
+
+  if (result.canceled || !result.filePaths.length) {
+    return { ok: false, canceled: true, status: await buildStatus() };
+  }
+
+  const selected = normalizeGameRoot(result.filePaths[0]);
+  const selectedMaindata = path.join(selected, 'maindata');
+  if (!exists(selectedMaindata)) {
+    return {
+      ok: false,
+      message: 'اختر مجلد اللعبة الذي يحتوي على مجلد maindata، أو اختر مجلد maindata نفسه.',
+      selected,
+      status: await buildStatus()
+    };
+  }
+
+  const configTarget = getGamePathConfigTarget();
+  fs.writeFileSync(configTarget, selected, 'utf8');
+  setGameRoot(selected, selectedMaindata);
+
+  return {
+    ok: true,
+    message: `تم حفظ مكان اللعبة: ${selected}`,
+    gameRoot: GAME_ROOT,
+    maindata: MAINDATA,
+    configPath: configTarget,
+    status: await buildStatus()
+  };
+});
 
 ipcMain.handle('manager:openPath', async (_event, key) => {
   const map = {

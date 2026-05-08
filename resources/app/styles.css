@@ -161,6 +161,30 @@ p {
     linear-gradient(180deg, rgba(30, 37, 51, 0.96), rgba(16, 20, 29, 0.96));
 }
 
+.game-path-panel {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 16px;
+  align-items: center;
+  margin-top: 16px;
+  padding: 18px 22px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.028), transparent 64px),
+    var(--panel);
+}
+
+.game-path-panel__path {
+  margin: 0;
+  color: var(--text);
+  direction: ltr;
+  text-align: left;
+  overflow-wrap: anywhere;
+  font-family: Consolas, "Cascadia Mono", monospace;
+  font-size: 15px;
+}
+
 .eyebrow {
   margin: 0 0 6px;
   color: var(--gold-strong);
@@ -420,6 +444,7 @@ p {
 
 @media (max-width: 980px) {
   .masthead,
+  .game-path-panel,
   .focus-card,
   .steps,
   .status-grid,

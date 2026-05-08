@@ -11,6 +11,7 @@ const els = {
   fileDbName: document.getElementById('fileDbName'),
   backupInfo: document.getElementById('backupInfo'),
   missingInfo: document.getElementById('missingInfo'),
+  gamePathText: document.getElementById('gamePathText'),
   logBox: document.getElementById('logBox'),
   musicBtn: document.getElementById('musicBtn'),
   ambientAudio: document.getElementById('ambientAudio'),
@@ -131,6 +132,8 @@ function renderStatus(status) {
   const running = status.running || [];
   const missing = status.missing || [];
 
+  els.gamePathText.textContent = status.gameRoot || 'لم يتم اختيار مكان اللعبة.';
+
   if (running.length) {
     els.gameState.textContent = 'مفتوحة';
     els.gameProcess.textContent = `عمليات نشطة: ${running.join(', ')}`;
@@ -211,6 +214,24 @@ window.arabicManager.onLog((payload) => appendLog(payload.type, payload.text));
 
 document.getElementById('refreshBtn').addEventListener('click', () => {
   runAction('تحديث الحالة...\n', () => refreshStatus());
+});
+
+document.getElementById('chooseGameBtn').addEventListener('click', async () => {
+  setBusy(true);
+  try {
+    const result = await window.arabicManager.chooseGameFolder();
+    if (result.status) renderStatus(result.status);
+    if (result.canceled) {
+      appendLog('info', '\nلم يتم اختيار مجلد.\n');
+    } else {
+      appendLog(result.ok ? 'success' : 'error', `\n${result.message}\n`);
+    }
+  } catch (error) {
+    appendLog('error', `\nERROR: ${error.message || error}\n`);
+  } finally {
+    setBusy(false);
+    await refreshStatus().catch(() => {});
+  }
 });
 
 document.getElementById('buildBtn').addEventListener('click', () => {
