@@ -1,7 +1,7 @@
 # Anno 117 Arabic Manager
 
 <p align="center">
-  <img src="resources/app/assets/roman-background.png" alt="Anno 117 Arabic Manager" width="100%">
+  <img src="resources/app/assets/readme-hero.png" alt="Anno 117 Arabic Manager" width="100%">
 </p>
 
 أداة عربية لإدارة تعريب **Anno 117: Pax Romana** بواجهة واحدة.
