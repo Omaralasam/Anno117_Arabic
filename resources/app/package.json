@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "One-window Arabic localization manager for Anno 117: Pax Romana.",
   "main": "electron-main.js",
-  "author": "Omar-alasam009",
+  "author": "Anno 117 Arabic Localization",
   "private": true,
   "scripts": {
     "start": "electron .",

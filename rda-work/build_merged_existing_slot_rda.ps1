@@ -1,13 +1,34 @@
-$ErrorActionPreference = "Stop"
+﻿$ErrorActionPreference = "Stop"
 
 $workspace = if ($env:ANNO117_ARABIC_WORKSPACE) { $env:ANNO117_ARABIC_WORKSPACE } else { Split-Path -Parent $PSScriptRoot }
 $toolRoot = Join-Path $workspace "tools\RDAExplorer"
+
+function Get-ConfiguredGameRoot {
+    if ($env:ANNO117_GAME_ROOT) {
+        return $env:ANNO117_GAME_ROOT
+    }
+
+    $gamePathFile = Join-Path $workspace "game-path.txt"
+    if (Test-Path -LiteralPath $gamePathFile) {
+        $configured = (Get-Content -LiteralPath $gamePathFile -Raw).Trim()
+        if ($configured) {
+            return $configured
+        }
+    }
+
+    return $null
+}
+
 $mainData = if ($env:ANNO117_GAME_MAINDATA) {
     $env:ANNO117_GAME_MAINDATA
 } elseif ($env:ANNO117_GAME_ROOT) {
     Join-Path $env:ANNO117_GAME_ROOT "maindata"
 } else {
-    "D:\SteamLibrary\steamapps\common\Anno 117 - Pax Romana\maindata"
+    $gameRoot = Get-ConfiguredGameRoot
+    if (-not $gameRoot) {
+        throw "لم يتم تحديد مكان اللعبة. افتح البرنامج واختر مجلد Anno 117 أولاً."
+    }
+    Join-Path $gameRoot "maindata"
 }
 $sourceRda = Join-Path $mainData "file_browse_patterns.rda"
 $payload = Join-Path $PSScriptRoot "anno117-direct-arabic\payload"
@@ -73,10 +94,10 @@ function Copy-PayloadOverlay([string]$SourceRoot, [string]$OutputRoot) {
 }
 
 if (-not (Test-Path -LiteralPath $sourceRda)) {
-    throw "Missing source archive: $sourceRda"
+    throw "أرشيف اللعبة غير موجود: $sourceRda"
 }
 if (-not (Test-Path -LiteralPath $payload)) {
-    throw "Missing Arabic payload: $payload"
+    throw "ملفات التعريب غير موجودة: $payload"
 }
 
 if (Test-Path -LiteralPath $mergedPayload) {
@@ -112,8 +133,8 @@ $writer.Write($directRda, $version, $false, $emptyReader, $null)
 
 $originalCount = @(Get-ChildItem -LiteralPath $mergedPayload\filebrowsercache -File -ErrorAction SilentlyContinue).Count
 $payloadCount = @(Get-ChildItem -LiteralPath $payload -Recurse -File).Count
-Write-Host "Merged existing-slot RDA built:"
+Write-Host "تم بناء أرشيف التعريب المدمج:"
 Write-Host "  $directRda"
-Write-Host "  files: $($fileList.Count)"
-Write-Host "  original filebrowsercache files: $originalCount"
-Write-Host "  Arabic overlay files: $payloadCount"
+Write-Host "  عدد الملفات: $($fileList.Count)"
+Write-Host "  ملفات filebrowsercache الأصلية: $originalCount"
+Write-Host "  ملفات التعريب: $payloadCount"

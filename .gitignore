@@ -1,6 +1,8 @@
 # Local paths and user-specific configuration
 game-path.txt
 *.log
+تقرير_الأداة_العربية.md
+resources/app/تقرير_الأداة_العربية.md
 
 # Build dependencies and generated packages
 node_modules/

@@ -1,13 +1,34 @@
-$ErrorActionPreference = "Stop"
+﻿$ErrorActionPreference = "Stop"
 
-$workspace = if ($env:ANNO117_ARABIC_WORKSPACE) { $env:ANNO117_ARABIC_WORKSPACE } else { "C:\Users\Omar-alasam009\Documents\Codex\2026-04-20-rda" }
+$workspace = if ($env:ANNO117_ARABIC_WORKSPACE) { $env:ANNO117_ARABIC_WORKSPACE } else { Split-Path -Parent $PSScriptRoot }
 $toolRoot = Join-Path $workspace "tools\RDAExplorer"
+
+function Get-ConfiguredGameRoot {
+    if ($env:ANNO117_GAME_ROOT) {
+        return $env:ANNO117_GAME_ROOT
+    }
+
+    $gamePathFile = Join-Path $workspace "game-path.txt"
+    if (Test-Path -LiteralPath $gamePathFile) {
+        $configured = (Get-Content -LiteralPath $gamePathFile -Raw).Trim()
+        if ($configured) {
+            return $configured
+        }
+    }
+
+    return $null
+}
+
 $maindata = if ($env:ANNO117_GAME_MAINDATA) {
     $env:ANNO117_GAME_MAINDATA
 } elseif ($env:ANNO117_GAME_ROOT) {
     Join-Path $env:ANNO117_GAME_ROOT "maindata"
 } else {
-    "D:\SteamLibrary\steamapps\common\Anno 117 - Pax Romana\maindata"
+    $gameRoot = Get-ConfiguredGameRoot
+    if (-not $gameRoot) {
+        throw "لم يتم تحديد مكان اللعبة. افتح البرنامج واختر مجلد Anno 117 أولاً."
+    }
+    Join-Path $gameRoot "maindata"
 }
 $directRda = Join-Path $workspace "rda-work\anno117-direct-arabic\data99.rda"
 $outputFileDb = Join-Path $workspace "rda-work\anno117-direct-arabic\file.db"
@@ -35,7 +56,7 @@ Unblock-LocalToolFiles $toolRoot
 [Reflection.Assembly]::LoadFrom((Join-Path $toolRoot "AnnoRDA.ChecksumDB.dll")) | Out-Null
 
 if (-not (Test-Path -LiteralPath $directRda)) {
-    throw "Missing direct Arabic RDA: $directRda"
+    throw "أرشيف التعريب غير موجود: $directRda"
 }
 
 $rdaPaths = New-Object System.Collections.Generic.List[string]

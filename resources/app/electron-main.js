@@ -4,6 +4,8 @@ const fs = require('fs');
 const crypto = require('crypto');
 const { spawn } = require('child_process');
 
+app.commandLine.appendSwitch('autoplay-policy', 'no-user-gesture-required');
+
 function hasWorkspaceFiles(folder) {
   return Boolean(
     folder &&
@@ -98,7 +100,6 @@ function findGameRoot() {
 
   const candidates = [
     ...parseSteamLibraries().map((library) => path.join(library, 'steamapps', 'common', 'Anno 117 - Pax Romana')),
-    'D:\\SteamLibrary\\steamapps\\common\\Anno 117 - Pax Romana',
     'C:\\Program Files (x86)\\Steam\\steamapps\\common\\Anno 117 - Pax Romana',
     'C:\\Program Files\\Ubisoft\\Ubisoft Game Launcher\\games\\Anno 117 - Pax Romana',
     'C:\\Program Files (x86)\\Ubisoft\\Ubisoft Game Launcher\\games\\Anno 117 - Pax Romana'
@@ -108,11 +109,11 @@ function findGameRoot() {
     if (exists(path.join(candidate, 'maindata'))) return candidate;
   }
 
-  return candidates[0] || 'D:\\SteamLibrary\\steamapps\\common\\Anno 117 - Pax Romana';
+  return null;
 }
 
 function resolveMaindata(gameRoot) {
-  return process.env.ANNO117_GAME_MAINDATA || path.join(gameRoot, 'maindata');
+  return process.env.ANNO117_GAME_MAINDATA || (gameRoot ? path.join(gameRoot, 'maindata') : null);
 }
 
 function normalizeGameRoot(selectedPath) {
@@ -151,15 +152,27 @@ const PATHS = {
 
 let mainWindow;
 
+const PROCESS_LABELS = {
+  Anno117: 'Anno 117',
+  UbisoftConnect: 'Ubisoft Connect',
+  UbisoftGameLauncher: 'Ubisoft Connect',
+  upc: 'Ubisoft Connect'
+};
+
+function displayProcessNames(processNames) {
+  return [...new Set(processNames.map((name) => PROCESS_LABELS[name] || name))];
+}
+
 function createWindow() {
   mainWindow = new BrowserWindow({
-    width: 1240,
-    height: 820,
-    minWidth: 1040,
-    minHeight: 700,
+    width: 1560,
+    height: 900,
+    minWidth: 1360,
+    minHeight: 820,
     backgroundColor: '#0f1218',
     title: 'Anno 117 Arabic Manager',
     icon: path.join(__dirname, 'assets', 'app-icon.png'),
+    frame: false,
     autoHideMenuBar: true,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
@@ -169,6 +182,7 @@ function createWindow() {
   });
 
   mainWindow.loadFile(path.join(__dirname, 'index.html'));
+  mainWindow.maximize();
 }
 
 if (process.argv.includes('--status-json')) {
@@ -206,6 +220,10 @@ function statInfo(filePath) {
 }
 
 function getDbNames() {
+  if (!MAINDATA) {
+    return { fileDb: 'file.db', checksumDb: 'checksum.db' };
+  }
+
   const fileDb = exists(path.join(MAINDATA, 'file_h.db')) ? 'file_h.db' : 'file.db';
   const checksumDb = exists(path.join(MAINDATA, 'checksum_h.db')) ? 'checksum_h.db' : 'checksum.db';
   return { fileDb, checksumDb };
@@ -226,6 +244,10 @@ function sha256(filePath) {
 
 function verifyInstalledChecksum() {
   try {
+    if (!MAINDATA || !exists(MAINDATA)) {
+      return { ok: false, message: 'اختر مكان اللعبة أولاً.' };
+    }
+
     const { fileDb, checksumDb } = getDbNames();
     const fileDbPath = path.join(MAINDATA, fileDb);
     const checksumPath = path.join(MAINDATA, checksumDb);
@@ -294,8 +316,8 @@ function runProcess(command, args, options = {}) {
       env: {
         ...process.env,
         ANNO117_ARABIC_WORKSPACE: WORKSPACE,
-        ANNO117_GAME_ROOT: GAME_ROOT,
-        ANNO117_GAME_MAINDATA: MAINDATA
+        ANNO117_GAME_ROOT: GAME_ROOT || '',
+        ANNO117_GAME_MAINDATA: MAINDATA || ''
       },
       windowsHide: true,
       shell: false
@@ -335,10 +357,11 @@ async function powershell(scriptPath, onData) {
 }
 
 async function getRunningProcesses() {
-  const script = "$names=@('Anno117','UbisoftConnect','upc'); $found=@(); foreach($n in $names){ if(Get-Process -Name $n -ErrorAction SilentlyContinue){ $found += $n }}; [Console]::Write(($found -join ','))";
+  const script = "$names=@('Anno117','UbisoftConnect','UbisoftGameLauncher','upc'); $found=@(); foreach($n in $names){ if(Get-Process -Name $n -ErrorAction SilentlyContinue){ $found += $n }}; [Console]::Write(($found -join ','))";
   try {
     const result = await runProcess('powershell.exe', ['-NoProfile', '-Command', script], { cwd: WORKSPACE });
-    return result.stdout.trim() ? result.stdout.trim().split(',') : [];
+    const processNames = result.stdout.trim() ? result.stdout.trim().split(',') : [];
+    return displayProcessNames(processNames);
   } catch {
     return [];
   }
@@ -356,7 +379,11 @@ function validatePrerequisites() {
   })) {
     if (!exists(filePath)) missing.push(`${label}: ${filePath}`);
   }
-  if (!exists(MAINDATA)) missing.push(`مجلد maindata: ${MAINDATA}`);
+  if (!GAME_ROOT || !MAINDATA) {
+    missing.push('مكان اللعبة: اختر مجلد Anno 117 من المرحلة الأولى.');
+  } else if (!exists(MAINDATA)) {
+    missing.push(`مجلد maindata غير موجود: ${MAINDATA}`);
+  }
   return missing;
 }
 
@@ -412,7 +439,9 @@ async function runWorkflow(event, steps) {
 
 async function buildStatus() {
   const { fileDb, checksumDb } = getDbNames();
-  const installedRda = path.join(MAINDATA, 'file_browse_patterns.rda');
+  const installedRda = MAINDATA ? path.join(MAINDATA, 'file_browse_patterns.rda') : '';
+  const fileDbPath = MAINDATA ? path.join(MAINDATA, fileDb) : '';
+  const checksumDbPath = MAINDATA ? path.join(MAINDATA, checksumDb) : '';
   const packageHash = sha256(PATHS.packageRda);
   const installedHash = sha256(installedRda);
 
@@ -421,6 +450,11 @@ async function buildStatus() {
   const checksum = verifyInstalledChecksum();
   const translation = measureTranslation();
   const latestBackup = readLatestBackup();
+  const fileDbInfo = statInfo(fileDbPath);
+  const checksumDbInfo = statInfo(checksumDbPath);
+  const installedRdaInfo = statInfo(installedRda);
+  const packageRdaInfo = statInfo(PATHS.packageRda);
+  const payloadXmlInfo = statInfo(PATHS.payloadXml);
 
   return {
     workspace: WORKSPACE,
@@ -429,12 +463,24 @@ async function buildStatus() {
     running,
     missing,
     dbNames: { fileDb, checksumDb },
+    checks: {
+      gameRootSelected: Boolean(GAME_ROOT),
+      maindataExists: exists(MAINDATA),
+      fileDbExists: Boolean(fileDbInfo),
+      checksumDbExists: Boolean(checksumDbInfo),
+      sourceRdaExists: Boolean(installedRdaInfo),
+      payloadExists: Boolean(payloadXmlInfo),
+      buildScriptsExist: exists(PATHS.buildMerged) && exists(PATHS.generateDb) && exists(PATHS.patchDb),
+      installScriptsExist: exists(PATHS.install) && exists(PATHS.restore),
+      packageExists: Boolean(packageRdaInfo),
+      latestBackupExists: Boolean(latestBackup)
+    },
     files: {
-      fileDb: statInfo(path.join(MAINDATA, fileDb)),
-      checksumDb: statInfo(path.join(MAINDATA, checksumDb)),
-      installedRda: statInfo(installedRda),
-      packageRda: statInfo(PATHS.packageRda),
-      payloadXml: statInfo(PATHS.payloadXml)
+      fileDb: fileDbInfo,
+      checksumDb: checksumDbInfo,
+      installedRda: installedRdaInfo,
+      packageRda: packageRdaInfo,
+      payloadXml: payloadXmlInfo
     },
     installedMatchesPackage: Boolean(packageHash && installedHash && packageHash === installedHash),
     checksum,
@@ -500,6 +546,34 @@ ipcMain.handle('manager:openPath', async (_event, key) => {
   return { ok: !result, message: result || 'تم الفتح.' };
 });
 
+ipcMain.handle('manager:openExternal', async (_event, url) => {
+  const allowed = new Set([
+    'https://github.com/Omaralasam',
+    'https://www.reddit.com/user/Stock-Passenger1587/'
+  ]);
+  if (!allowed.has(url)) return { ok: false, message: 'الرابط غير مسموح.' };
+  await shell.openExternal(url);
+  return { ok: true, message: 'تم فتح الرابط.' };
+});
+
 ipcMain.handle('manager:showMessage', async (_event, options) => {
   return dialog.showMessageBox(mainWindow, options);
+});
+
+ipcMain.handle('window:minimize', () => {
+  mainWindow?.minimize();
+});
+
+ipcMain.handle('window:toggleMaximize', () => {
+  if (!mainWindow) return false;
+  if (mainWindow.isMaximized()) {
+    mainWindow.unmaximize();
+    return false;
+  }
+  mainWindow.maximize();
+  return true;
+});
+
+ipcMain.handle('window:close', () => {
+  mainWindow?.close();
 });

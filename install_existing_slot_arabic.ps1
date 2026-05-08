@@ -1,7 +1,44 @@
-$ErrorActionPreference = "Stop"
+﻿$ErrorActionPreference = "Stop"
 
-$workspace = if ($env:ANNO117_ARABIC_WORKSPACE) { $env:ANNO117_ARABIC_WORKSPACE } else { "C:\Users\Omar-alasam009\Documents\Codex\2026-04-20-rda" }
-$gameRoot = if ($env:ANNO117_GAME_ROOT) { $env:ANNO117_GAME_ROOT } else { "D:\SteamLibrary\steamapps\common\Anno 117 - Pax Romana" }
+$workspace = if ($env:ANNO117_ARABIC_WORKSPACE) { $env:ANNO117_ARABIC_WORKSPACE } else { $PSScriptRoot }
+
+function Get-ConfiguredGameRoot {
+    if ($env:ANNO117_GAME_ROOT) {
+        return $env:ANNO117_GAME_ROOT
+    }
+
+    $gamePathFile = Join-Path $workspace "game-path.txt"
+    if (Test-Path -LiteralPath $gamePathFile) {
+        $configured = (Get-Content -LiteralPath $gamePathFile -Raw).Trim()
+        if ($configured) {
+            return $configured
+        }
+    }
+
+    return $null
+}
+
+function Get-BlockingProcesses {
+    $labels = @{
+        "Anno117" = "Anno 117"
+        "UbisoftConnect" = "Ubisoft Connect"
+        "UbisoftGameLauncher" = "Ubisoft Connect"
+        "upc" = "Ubisoft Connect"
+    }
+
+    $open = foreach ($processName in $labels.Keys) {
+        if (Get-Process -Name $processName -ErrorAction SilentlyContinue) {
+            $labels[$processName]
+        }
+    }
+
+    return @($open | Select-Object -Unique)
+}
+
+$gameRoot = Get-ConfiguredGameRoot
+if (-not $gameRoot) {
+    throw "لم يتم تحديد مكان اللعبة. افتح البرنامج واختر مجلد Anno 117 أولاً."
+}
 $maindata = if ($env:ANNO117_GAME_MAINDATA) { $env:ANNO117_GAME_MAINDATA } else { Join-Path $gameRoot "maindata" }
 $package = Join-Path $workspace "rda-work\existing-slot-arabic"
 $backupRoot = Join-Path $workspace "backups\existing-slot-arabic"
@@ -10,10 +47,9 @@ function Get-Sha256([string]$path) {
     return (Get-FileHash -LiteralPath $path -Algorithm SHA256).Hash.ToUpperInvariant()
 }
 
-foreach ($processName in @("Anno117", "UbisoftConnect", "upc")) {
-    if (Get-Process -Name $processName -ErrorAction SilentlyContinue) {
-        throw "Close $processName before installing."
-    }
+$blockingProcesses = Get-BlockingProcesses
+if ($blockingProcesses.Count) {
+    throw "أغلق $($blockingProcesses -join ' و ') قبل التثبيت."
 }
 
 $fileDbName = if (Test-Path -LiteralPath (Join-Path $maindata "file_h.db")) { "file_h.db" } else { "file.db" }
@@ -25,7 +61,7 @@ $sourceRda = Join-Path $package "file_browse_patterns.rda"
 
 foreach ($path in @($sourceFileDb, $sourceChecksumDb, $sourceRda)) {
     if (-not (Test-Path -LiteralPath $path)) {
-        throw "Missing package file: $path"
+        throw "ملف الحزمة غير موجود: $path"
     }
 }
 
@@ -49,7 +85,7 @@ Copy-Item -LiteralPath $sourceRda -Destination $targetRda -Force
 
 Set-Content -LiteralPath (Join-Path $backupRoot "latest.txt") -Value $backup -Encoding UTF8
 
-Write-Host "Installed Arabic package."
-Write-Host "Database: $fileDbName / $checksumDbName"
-Write-Host "Backup: $backup"
-Write-Host "If the game fails, run restore_existing_slot_arabic.ps1"
+Write-Host "تم تثبيت التعريب بنجاح."
+Write-Host "قاعدة الملفات: $fileDbName / $checksumDbName"
+Write-Host "النسخة الاحتياطية: $backup"
+Write-Host "إذا ظهرت مشكلة، استخدم زر استعادة آخر نسخة من البرنامج."

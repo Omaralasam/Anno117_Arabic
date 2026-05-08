@@ -206,10 +206,14 @@ function copyFile(source, target) {
 }
 
 function patchExistingSlot(options = {}) {
-  const workspace = options.workspace || process.env.ANNO117_ARABIC_WORKSPACE || 'C:\\Users\\Omar-alasam009\\Documents\\Codex\\2026-04-20-rda';
+  const workspace = options.workspace || process.env.ANNO117_ARABIC_WORKSPACE || path.resolve(__dirname, '..');
   const maindata = options.maindata ||
     process.env.ANNO117_GAME_MAINDATA ||
-    (process.env.ANNO117_GAME_ROOT ? path.join(process.env.ANNO117_GAME_ROOT, 'maindata') : 'D:\\SteamLibrary\\steamapps\\common\\Anno 117 - Pax Romana\\maindata');
+    (process.env.ANNO117_GAME_ROOT ? path.join(process.env.ANNO117_GAME_ROOT, 'maindata') : null);
+
+  if (!maindata) {
+    throw new Error('Game folder is not configured. Choose the Anno 117 folder in the manager first.');
+  }
 
   const direct = path.join(workspace, 'rda-work', 'anno117-direct-arabic');
   const originalFileDb = path.join(maindata, exists(path.join(maindata, 'file_h.db')) ? 'file_h.db' : 'file.db');

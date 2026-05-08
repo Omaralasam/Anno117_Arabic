@@ -7,125 +7,202 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <audio id="ambientAudio" loop preload="none">
+  <audio id="ambientAudio" loop preload="auto" autoplay>
     <source src="assets/audio/anno117-theme.mp3" type="audio/mpeg">
     <source src="assets/audio/anno117-theme.ogg" type="audio/ogg">
+    <source src="assets/audio/anno117-theme.wav" type="audio/wav">
   </audio>
 
+  <header class="app-titlebar" aria-label="شريط النافذة">
+    <div class="titlebar-brand">
+      <img src="assets/app-icon.svg" alt="">
+      <span>Anno 117 Arabic Manager</span>
+    </div>
+    <div class="window-controls" aria-label="أزرار النافذة">
+      <button class="window-control" data-window-action="minimize" type="button" title="تصغير">─</button>
+      <button class="window-control" data-window-action="maximize" type="button" title="تكبير">□</button>
+      <button class="window-control close" data-window-action="close" type="button" title="إغلاق">×</button>
+    </div>
+  </header>
+
   <main class="app-shell">
-    <header class="masthead">
-      <img class="masthead__mark" src="assets/app-icon.svg" alt="">
-      <div>
-        <p class="masthead__label">Anno 117: Pax Romana</p>
-        <h1>عام 117: السلام الروماني</h1>
-        <p class="masthead__signature">تعريب وإدارة Omar009</p>
+    <section class="scene-panel" aria-label="خلفية Anno 117"></section>
+
+    <section class="wizard-panel" aria-label="مراحل تثبيت التعريب">
+      <header class="wizard-header">
+        <div>
+          <p class="section-label">مدير التعريب</p>
+          <h2 id="stageTitle">اختيار مكان اللعبة</h2>
+        </div>
+        <button class="ghost-button" id="musicBtn" type="button" title="تشغيل أو إيقاف موسيقى اللعبة">
+          <span aria-hidden="true">♪</span>
+          <span>موسيقى اللعبة</span>
+        </button>
+      </header>
+
+      <div class="stage-track" aria-label="المراحل">
+        <span class="stage-dot is-active" data-dot="1">1</span>
+        <span></span>
+        <span class="stage-dot" data-dot="2">2</span>
+        <span></span>
+        <span class="stage-dot" data-dot="3">3</span>
+        <span></span>
+        <span class="stage-dot" data-dot="4">4</span>
       </div>
-      <button class="icon-button" id="musicBtn" type="button" title="تشغيل أو إيقاف موسيقى الواجهة">
-        <span aria-hidden="true">♪</span>
-        <span>الموسيقى</span>
-      </button>
-    </header>
 
-    <section class="game-path-panel">
-      <div>
-        <p class="eyebrow">مكان اللعبة</p>
-        <p class="game-path-panel__path" id="gamePathText">يفحص مكان اللعبة...</p>
-      </div>
-      <button id="chooseGameBtn" type="button">اختيار مكان اللعبة</button>
-    </section>
+      <div class="status-pill" id="mainBadge">يفحص الحالة...</div>
 
-    <section class="focus-card">
-      <div class="focus-card__content">
-        <p class="eyebrow">لوحة التعريب المختصرة</p>
-        <h2>ماذا تريد أن تفعل الآن؟</h2>
-        <p class="subtitle">أغلق اللعبة، ثم استخدم الزر الكبير. البرنامج سيبني الحزمة، يأخذ نسخة احتياطية، ويثبت التعريب بالطريقة الآمنة.</p>
-      </div>
-      <div class="focus-card__badge" id="mainBadge">يفحص الحالة...</div>
-    </section>
+      <section class="stage-page is-active" data-stage="1">
+        <p class="section-label">المرحلة 1</p>
+        <h3>اختر مجلد Anno 117</h3>
+        <p class="stage-copy">إذا لم يتعرف البرنامج على مكان اللعبة تلقائيًا، اضغط الزر واختر مجلد اللعبة يدويًا.</p>
+        <div class="path-display" id="gamePathText">يفحص مكان اللعبة...</div>
+        <div class="check-list" id="stage1Checks" aria-label="فحص المرحلة الأولى"></div>
+        <button class="primary" id="chooseGameBtn" type="button">إذا لم يتعرف على اللعبة، اضغط هنا واختر يدويًا</button>
+        <button class="next-button" id="goStage2Btn" type="button">التالي: الفحص</button>
+      </section>
 
-    <section class="steps" aria-label="مراحل العمل">
-      <article class="step-card">
-        <span class="step-card__number">1</span>
-        <h3>افحص الحالة</h3>
-        <p>يتأكد أن اللعبة مغلقة وأن ملفات التعريب والفهرس سليمة.</p>
-        <button id="refreshBtn" type="button">فحص سريع</button>
-      </article>
+      <section class="stage-page" data-stage="2">
+        <p class="section-label">المرحلة 2</p>
+        <h3>افحص الجاهزية</h3>
+        <div class="status-pair">
+          <span>اللعبة</span>
+          <strong id="gameState">...</strong>
+          <small id="gameProcess">...</small>
+        </div>
+        <div class="status-pair">
+          <span>الملفات</span>
+          <strong id="missingInfo">...</strong>
+        </div>
+        <div class="status-pair">
+          <span>الفهرس</span>
+          <strong id="checksumState">...</strong>
+          <small id="checksumDetail">...</small>
+        </div>
+        <div class="check-list" id="stage2Checks" aria-label="فحص المرحلة الثانية"></div>
+        <div class="stage-actions">
+          <button id="backStage1Btn" type="button">رجوع</button>
+          <button class="primary" id="refreshBtn" type="button">فحص سريع</button>
+          <button id="goStage3Btn" type="button">التالي: التثبيت</button>
+        </div>
+      </section>
 
-      <article class="step-card step-card--primary">
-        <span class="step-card__number">2</span>
-        <h3>ثبّت التعريب</h3>
-        <p>الخيار الطبيعي لمعظم الاستخدام: يبني الحزمة ثم يثبتها داخل اللعبة.</p>
-        <button class="primary" id="buildAndInstallBtn" type="button">جهز وثبّت التعريب</button>
-      </article>
-
-      <article class="step-card">
-        <span class="step-card__number">3</span>
-        <h3>استرجاع آمن</h3>
-        <p>يرجع آخر نسخة احتياطية إذا ظهر خلل بعد تجربة اللعبة.</p>
-        <button class="danger" id="restoreBtn" type="button">استعادة آخر نسخة</button>
-      </article>
-    </section>
-
-    <section class="status-grid" aria-label="حالة التعريب">
-      <article class="status-card">
-        <span class="status-card__label">اللعبة</span>
-        <strong id="gameState">...</strong>
-        <small id="gameProcess">...</small>
-      </article>
-      <article class="status-card">
-        <span class="status-card__label">التثبيت</span>
-        <strong id="packageState">...</strong>
-        <small id="packageDetail">...</small>
-      </article>
-      <article class="status-card">
-        <span class="status-card__label">الفهرس</span>
-        <strong id="checksumState">...</strong>
-        <small id="checksumDetail">...</small>
-      </article>
-      <article class="status-card">
-        <span class="status-card__label">نسبة التعريب</span>
-        <strong id="translationPercent">...</strong>
-        <small id="translationDetail">...</small>
-      </article>
-    </section>
-
-    <details class="advanced">
-      <summary>
-        <span>خيارات متقدمة</span>
-        <small>للمراجعة، فتح المجلدات، أو تنفيذ البناء والتثبيت كل واحد لوحده</small>
-      </summary>
-
-      <div class="advanced__grid">
-        <section class="tool-panel">
-          <h2>أدوات منفصلة</h2>
-          <div class="actions">
+      <section class="stage-page" data-stage="3">
+        <p class="section-label">المرحلة 3</p>
+        <h3>جهز وثبت التعريب</h3>
+        <div class="status-pair">
+          <span>الحزمة</span>
+          <strong id="packageState">...</strong>
+          <small id="packageDetail">...</small>
+        </div>
+        <p class="stage-copy">أغلق اللعبة و Ubisoft Connect قبل التثبيت، ثم اضغط الزر الكبير.</p>
+        <div class="check-list" id="stage3Checks" aria-label="فحص المرحلة الثالثة"></div>
+        <button class="primary install-button" id="buildAndInstallBtn" type="button">جهز وثبت التعريب</button>
+        <details class="advanced-mini">
+          <summary>خيارات متقدمة</summary>
+          <div>
             <button id="buildBtn" type="button">بناء الحزمة فقط</button>
-            <button id="installBtn" type="button">تثبيت آخر حزمة جاهزة</button>
+            <button id="installBtn" type="button">تثبيت آخر حزمة</button>
           </div>
+        </details>
+        <div class="stage-actions">
+          <button id="backStage2Btn" type="button">رجوع</button>
+          <button id="goStage4Btn" type="button">التالي: النتيجة</button>
+        </div>
+      </section>
 
-          <h2>المجلدات</h2>
-          <div class="path-list">
-            <button data-open="workspace" type="button">مجلد المشروع</button>
-            <button data-open="maindata" type="button">مجلد maindata</button>
-            <button data-open="package" type="button">الحزمة الجاهزة</button>
-            <button data-open="backups" type="button">النسخ الاحتياطية</button>
-            <button data-open="payload" type="button">ملفات الترجمة</button>
-          </div>
+      <section class="stage-page" data-stage="4">
+        <p class="section-label">المرحلة 4</p>
+        <h3>النتيجة والاستعادة</h3>
+        <div class="status-pair">
+          <span>نسبة التعريب</span>
+          <strong id="translationPercent">...</strong>
+          <small id="translationDetail">...</small>
+        </div>
+        <div class="status-pair">
+          <span>قاعدة الملفات</span>
+          <strong id="fileDbName">...</strong>
+        </div>
+        <div class="status-pair">
+          <span>آخر نسخة احتياطية</span>
+          <strong id="backupInfo">...</strong>
+        </div>
+        <div class="check-list" id="stage4Checks" aria-label="فحص المرحلة الرابعة"></div>
+        <button class="danger" id="restoreBtn" type="button">استعادة آخر نسخة</button>
+        <div class="folder-row">
+          <button data-open="workspace" type="button">المشروع</button>
+          <button data-open="maindata" type="button">maindata</button>
+          <button data-open="package" type="button">الحزمة</button>
+          <button data-open="backups" type="button">النسخ</button>
+          <button data-open="payload" type="button">التعريب</button>
+        </div>
+        <button id="backStage3Btn" type="button">رجوع</button>
+      </section>
 
-          <dl class="facts">
-            <div><dt>قاعدة الملفات</dt><dd id="fileDbName">...</dd></div>
-            <div><dt>آخر نسخة احتياطية</dt><dd id="backupInfo">...</dd></div>
-            <div><dt>ملفات ناقصة</dt><dd id="missingInfo">...</dd></div>
-          </dl>
-        </section>
+      <details class="log-details">
+        <summary>سجل التنفيذ</summary>
+        <pre id="logBox" class="log-box">جاهز. اختر مكان اللعبة أولًا.</pre>
+      </details>
 
-        <section class="log-panel">
-          <h2>سجل التنفيذ</h2>
-          <pre id="logBox" class="log-box">جاهز. أغلق اللعبة قبل التثبيت.</pre>
-        </section>
-      </div>
-    </details>
+      <footer class="creator-signature" aria-label="توقيع التطوير والترجمة">
+        <span>تطوير وترجمة</span>
+        <strong>عمر الاعسم</strong>
+        <button class="github-link" data-external-url="https://github.com/Omaralasam" type="button" aria-label="فتح صفحة Omar alasam على GitHub" title="GitHub">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M12 .5C5.65 .5.5 5.65.5 12c0 5.1 3.29 9.42 7.86 10.95.58.11.79-.25.79-.56 0-.28-.01-1.02-.02-2-3.2.7-3.88-1.54-3.88-1.54-.52-1.34-1.28-1.69-1.28-1.69-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.76 2.7 1.25 3.36.96.1-.75.4-1.25.73-1.54-2.56-.29-5.25-1.28-5.25-5.7 0-1.26.45-2.29 1.19-3.1-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18A11.1 11.1 0 0 1 12 6.01c.98.01 1.97.13 2.89.39 2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.84 1.19 3.1 0 4.43-2.7 5.4-5.27 5.69.41.35.78 1.05.78 2.12 0 1.53-.01 2.76-.01 3.14 0 .31.21.67.8.56A11.52 11.52 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5Z"></path>
+          </svg>
+        </button>
+        <button class="social-link reddit-link" data-external-url="https://www.reddit.com/user/Stock-Passenger1587/" type="button" aria-label="فتح صفحة Stock-Passenger1587 على Reddit" title="Reddit">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M21.5 12.13a2.48 2.48 0 0 0-4.2-1.79c-1.22-.78-2.85-1.27-4.64-1.34l.79-3.72 2.58.55a1.9 1.9 0 1 0 .21-1l-3.16-.67a.52.52 0 0 0-.62.4L11.52 9c-1.86.05-3.56.54-4.82 1.34a2.48 2.48 0 1 0-2.73 4.04c-.02.17-.03.34-.03.52 0 3.26 3.61 5.9 8.06 5.9s8.06-2.64 8.06-5.9c0-.18-.01-.35-.03-.52.88-.42 1.47-1.28 1.47-2.25ZM7.5 13.85a1.25 1.25 0 1 1 2.5 0 1.25 1.25 0 0 1-2.5 0Zm7.5 3.5c-.79.79-2.1 1.06-3 1.06s-2.21-.27-3-1.06a.53.53 0 0 1 .75-.75c.5.5 1.43.75 2.25.75s1.75-.25 2.25-.75a.53.53 0 0 1 .75.75Zm-.99-2.25a1.25 1.25 0 1 1 0-2.5 1.25 1.25 0 0 1 0 2.5Z"></path>
+          </svg>
+        </button>
+      </footer>
+    </section>
   </main>
+
+  <div class="intro-modal" id="introModal" role="dialog" aria-modal="true" aria-labelledby="introTitle">
+    <div class="intro-card">
+      <p class="section-label">قبل أن تبدأ</p>
+      <h2 id="introTitle">كيف يعمل مدير التعريب؟</h2>
+      <div class="intro-steps">
+        <div>
+          <strong>1</strong>
+          <span>أغلق اللعبة وبرنامج Ubisoft Connect قبل التثبيت أو قبل إرجاع الملفات الأصلية.</span>
+        </div>
+        <div>
+          <strong>2</strong>
+          <span>يتعرف البرنامج على مكان اللعبة تلقائيًا. إذا لم يتعرف عليها، اضغط زر الاختيار اليدوي.</span>
+        </div>
+        <div>
+          <strong>3</strong>
+          <span>اضغط فحص سريع للتأكد من سلامة الملفات والفهرس.</span>
+        </div>
+        <div>
+          <strong>4</strong>
+          <span>اضغط جهز وثبت التعريب. البرنامج يبني الحزمة من ملفات لعبتك ثم يأخذ نسخة احتياطية.</span>
+        </div>
+        <div>
+          <strong>5</strong>
+          <span>إذا ظهرت مشكلة بعد التجربة، ارجع للبرنامج واضغط استعادة آخر نسخة لإرجاع ملفات اللعبة الأصلية.</span>
+        </div>
+      </div>
+      <button class="primary intro-close" id="introCloseBtn" type="button">فهمت، ابدأ</button>
+      <div class="intro-signature">
+        <span>تطوير وترجمة عمر الاعسم</span>
+        <button class="github-link" data-external-url="https://github.com/Omaralasam" type="button" aria-label="فتح صفحة Omar alasam على GitHub" title="GitHub">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M12 .5C5.65 .5.5 5.65.5 12c0 5.1 3.29 9.42 7.86 10.95.58.11.79-.25.79-.56 0-.28-.01-1.02-.02-2-3.2.7-3.88-1.54-3.88-1.54-.52-1.34-1.28-1.69-1.28-1.69-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.76 2.7 1.25 3.36.96.1-.75.4-1.25.73-1.54-2.56-.29-5.25-1.28-5.25-5.7 0-1.26.45-2.29 1.19-3.1-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.18 1.18A11.1 11.1 0 0 1 12 6.01c.98.01 1.97.13 2.89.39 2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.84 1.19 3.1 0 4.43-2.7 5.4-5.27 5.69.41.35.78 1.05.78 2.12 0 1.53-.01 2.76-.01 3.14 0 .31.21.67.8.56A11.52 11.52 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5Z"></path>
+          </svg>
+        </button>
+        <button class="social-link reddit-link" data-external-url="https://www.reddit.com/user/Stock-Passenger1587/" type="button" aria-label="فتح صفحة Stock-Passenger1587 على Reddit" title="Reddit">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M21.5 12.13a2.48 2.48 0 0 0-4.2-1.79c-1.22-.78-2.85-1.27-4.64-1.34l.79-3.72 2.58.55a1.9 1.9 0 1 0 .21-1l-3.16-.67a.52.52 0 0 0-.62.4L11.52 9c-1.86.05-3.56.54-4.82 1.34a2.48 2.48 0 1 0-2.73 4.04c-.02.17-.03.34-.03.52 0 3.26 3.61 5.9 8.06 5.9s8.06-2.64 8.06-5.9c0-.18-.01-.35-.03-.52.88-.42 1.47-1.28 1.47-2.25ZM7.5 13.85a1.25 1.25 0 1 1 2.5 0 1.25 1.25 0 0 1-2.5 0Zm7.5 3.5c-.79.79-2.1 1.06-3 1.06s-2.21-.27-3-1.06a.53.53 0 0 1 .75-.75c.5.5 1.43.75 2.25.75s1.75-.25 2.25-.75a.53.53 0 0 1 .75.75Zm-.99-2.25a1.25 1.25 0 1 1 0-2.5 1.25 1.25 0 0 1 0 2.5Z"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
 
   <script src="renderer.js"></script>
 </body>

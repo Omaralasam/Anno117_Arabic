@@ -1,37 +1,54 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Anno 117 Arabic crest">
   <defs>
-    <radialGradient id="bg" cx="48%" cy="38%" r="70%">
-      <stop offset="0" stop-color="#31405a"/>
-      <stop offset="0.58" stop-color="#17202f"/>
-      <stop offset="1" stop-color="#0b0f18"/>
+    <radialGradient id="shadow" cx="50%" cy="48%" r="58%">
+      <stop offset="0.55" stop-color="#000" stop-opacity="0"/>
+      <stop offset="1" stop-color="#000" stop-opacity=".34"/>
     </radialGradient>
-    <linearGradient id="gold" x1="44" y1="28" x2="210" y2="224">
-      <stop offset="0" stop-color="#fff2bd"/>
-      <stop offset="0.32" stop-color="#d8b363"/>
-      <stop offset="0.7" stop-color="#8f6734"/>
-      <stop offset="1" stop-color="#f3d994"/>
+    <radialGradient id="wine" cx="44%" cy="28%" r="78%">
+      <stop offset="0" stop-color="#913c3f"/>
+      <stop offset=".55" stop-color="#5c1e25"/>
+      <stop offset="1" stop-color="#220b10"/>
+    </radialGradient>
+    <linearGradient id="gold" x1="52" y1="22" x2="205" y2="235">
+      <stop offset="0" stop-color="#fff6c8"/>
+      <stop offset=".22" stop-color="#e7c76c"/>
+      <stop offset=".48" stop-color="#9b6d32"/>
+      <stop offset=".76" stop-color="#f5df98"/>
+      <stop offset="1" stop-color="#9c7134"/>
     </linearGradient>
-    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
-      <feDropShadow dx="0" dy="8" stdDeviation="8" flood-color="#000" flood-opacity=".45"/>
+    <linearGradient id="darkGold" x1="86" y1="47" x2="171" y2="211">
+      <stop offset="0" stop-color="#c6973f"/>
+      <stop offset="1" stop-color="#5b3a18"/>
+    </linearGradient>
+    <filter id="lift" x="-25%" y="-25%" width="150%" height="150%">
+      <feDropShadow dx="0" dy="13" stdDeviation="12" flood-color="#000" flood-opacity=".45"/>
     </filter>
   </defs>
 
-  <rect width="256" height="256" rx="54" fill="#0f1218"/>
-  <circle cx="128" cy="128" r="106" fill="url(#bg)" stroke="url(#gold)" stroke-width="10"/>
-  <circle cx="128" cy="128" r="82" fill="none" stroke="#d8b363" stroke-width="2" opacity=".55"/>
+  <circle cx="128" cy="128" r="116" fill="#07080b" opacity=".92" filter="url(#lift)"/>
+  <circle cx="128" cy="128" r="108" fill="url(#shadow)" stroke="url(#gold)" stroke-width="10"/>
+  <circle cx="128" cy="128" r="91" fill="#17100e" stroke="#f3d98a" stroke-width="2.5" opacity=".95"/>
+  <circle cx="128" cy="128" r="77" fill="url(#wine)" stroke="url(#gold)" stroke-width="5"/>
 
-  <path d="M75 190c-10-18-14-37-9-58 7-32 33-57 62-75 29 18 55 43 62 75 5 21 1 40-9 58-17-7-34-10-53-10s-36 3-53 10z"
-        fill="#7d2d34" opacity=".86" stroke="#e5c47b" stroke-width="4" filter="url(#shadow)"/>
+  <path d="M72 126c13-34 37-51 56-51s43 17 56 51" fill="none" stroke="#f3d98a" stroke-width="7" stroke-linecap="round" opacity=".62"/>
+  <path d="M84 145h88M92 128h72M101 112h54" stroke="url(#darkGold)" stroke-width="5" stroke-linecap="round" opacity=".88"/>
+  <path d="M99 164c15 13 43 13 58 0" fill="none" stroke="#f4df9d" stroke-width="4" stroke-linecap="round" opacity=".65"/>
 
-  <text x="128" y="121" text-anchor="middle"
+  <g fill="none" stroke="#e7c76c" stroke-linecap="round">
+    <path d="M70 74c-20 25-29 58-22 90 5 23 18 43 38 58" stroke-width="4" opacity=".75"/>
+    <path d="M186 74c20 25 29 58 22 90-5 23-18 43-38 58" stroke-width="4" opacity=".75"/>
+    <path d="M64 93l-15-5M57 114l-16-1M57 136l-15 4M63 157l-13 8M73 177l-10 11M192 93l15-5M199 114l16-1M199 136l15 4M193 157l13 8M183 177l10 11" stroke-width="3.3" opacity=".85"/>
+  </g>
+
+  <text x="128" y="125" text-anchor="middle"
         font-family="Georgia, 'Times New Roman', serif"
-        font-size="58" font-weight="700" fill="#f6e6b9"
-        stroke="#3a2818" stroke-width="1.5">117</text>
-  <text x="128" y="164" text-anchor="middle" direction="rtl"
-        font-family="'Segoe UI', Tahoma, Arial, sans-serif"
-        font-size="34" font-weight="700" fill="#f6e6b9"
-        stroke="#3a2818" stroke-width="1.1">عربي</text>
+        font-size="61" font-weight="700" fill="#fff0bd"
+        stroke="#21110c" stroke-width="1.2">117</text>
+  <text x="128" y="170" text-anchor="middle" direction="rtl"
+        font-family="'El Messiri', 'Segoe UI', Tahoma, Arial, sans-serif"
+        font-size="28" font-weight="700" fill="#fff0bd"
+        stroke="#21110c" stroke-width=".9">عربي</text>
 
-  <path d="M59 75c22-18 42-28 69-33 27 5 47 15 69 33" fill="none" stroke="#f0d28d" stroke-width="6" stroke-linecap="round" opacity=".82"/>
-  <path d="M57 205c40 20 102 20 142 0" fill="none" stroke="#f0d28d" stroke-width="6" stroke-linecap="round" opacity=".72"/>
+  <path d="M59 58c33-24 105-24 138 0" fill="none" stroke="#fff0bd" stroke-width="5" stroke-linecap="round" opacity=".86"/>
+  <path d="M58 202c34 28 106 28 140 0" fill="none" stroke="#dfbd66" stroke-width="5" stroke-linecap="round" opacity=".72"/>
 </svg>
