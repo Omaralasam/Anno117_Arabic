@@ -41,6 +41,12 @@ https://github.com/Omaralasam/Anno117_Arabic/releases/latest/download/Anno117_Ar
 - مجلد `tools\RDAExplorer` مطلوب كملفات داخلية لبناء الحزمة.
 - البرنامج لا يحتوي على ملفات اللعبة الأصلية ولا يوزعها.
 
+## إذا ظهرت رسالة "ملفات ناقصة"
+
+حمّل نسخة البرنامج الجاهزة من صفحة Releases، ثم فك الضغط بالكامل، ثم شغّل `Anno117ArabicManager.exe` من المجلد المفكوك.
+
+لا تستخدم زر **Download ZIP** الموجود في صفحة الكود، لأنه يحمّل ملفات المشروع وليس نسخة التشغيل الجاهزة.
+
 ## التواصل
 
 - GitHub: `https://github.com/Omaralasam`
