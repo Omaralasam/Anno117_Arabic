@@ -1,0 +1,21 @@
+# Local paths and user-specific configuration
+game-path.txt
+*.log
+
+# Build dependencies and generated packages
+node_modules/
+resources/app/node_modules/
+desktop-dist/
+dist/
+build/
+
+# Local work files, generated game archives, and backups
+backups/
+rda-work/
+
+# OS/editor noise
+Thumbs.db
+Desktop.ini
+.DS_Store
+.vscode/
+.idea/

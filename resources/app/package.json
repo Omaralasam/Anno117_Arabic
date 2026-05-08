@@ -1,0 +1,17 @@
+{
+  "name": "anno117-arabic-manager",
+  "version": "1.0.0",
+  "description": "One-window Arabic localization manager for Anno 117: Pax Romana.",
+  "main": "electron-main.js",
+  "author": "Omar-alasam009",
+  "private": true,
+  "scripts": {
+    "start": "electron .",
+    "check": "node --check electron-main.js && node --check preload.js && node --check renderer.js",
+    "build:portable": "electron-packager . \"Anno 117 Arabic Manager\" --platform=win32 --arch=x64 --out=desktop-dist --overwrite --prune --icon=assets/app-icon.ico --executable-name=Anno117ArabicManager"
+  },
+  "devDependencies": {
+    "@electron/packager": "^18.3.6",
+    "electron": "^38.1.2"
+  }
+}

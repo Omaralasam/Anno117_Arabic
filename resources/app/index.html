@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Anno 117 Arabic Manager</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <audio id="ambientAudio" loop preload="none">
+    <source src="assets/audio/anno117-theme.mp3" type="audio/mpeg">
+    <source src="assets/audio/anno117-theme.ogg" type="audio/ogg">
+  </audio>
+
+  <main class="app-shell">
+    <header class="masthead">
+      <img class="masthead__mark" src="assets/app-icon.svg" alt="">
+      <div>
+        <p class="masthead__label">Anno 117: Pax Romana</p>
+        <h1>عام 117: السلام الروماني</h1>
+        <p class="masthead__signature">تعريب وإدارة Omar009</p>
+      </div>
+      <button class="icon-button" id="musicBtn" type="button" title="تشغيل أو إيقاف موسيقى الواجهة">
+        <span aria-hidden="true">♪</span>
+        <span>الموسيقى</span>
+      </button>
+    </header>
+
+    <section class="focus-card">
+      <div class="focus-card__content">
+        <p class="eyebrow">لوحة التعريب المختصرة</p>
+        <h2>ماذا تريد أن تفعل الآن؟</h2>
+        <p class="subtitle">أغلق اللعبة، ثم استخدم الزر الكبير. البرنامج سيبني الحزمة، يأخذ نسخة احتياطية، ويثبت التعريب بالطريقة الآمنة.</p>
+      </div>
+      <div class="focus-card__badge" id="mainBadge">يفحص الحالة...</div>
+    </section>
+
+    <section class="steps" aria-label="مراحل العمل">
+      <article class="step-card">
+        <span class="step-card__number">1</span>
+        <h3>افحص الحالة</h3>
+        <p>يتأكد أن اللعبة مغلقة وأن ملفات التعريب والفهرس سليمة.</p>
+        <button id="refreshBtn" type="button">فحص سريع</button>
+      </article>
+
+      <article class="step-card step-card--primary">
+        <span class="step-card__number">2</span>
+        <h3>ثبّت التعريب</h3>
+        <p>الخيار الطبيعي لمعظم الاستخدام: يبني الحزمة ثم يثبتها داخل اللعبة.</p>
+        <button class="primary" id="buildAndInstallBtn" type="button">جهز وثبّت التعريب</button>
+      </article>
+
+      <article class="step-card">
+        <span class="step-card__number">3</span>
+        <h3>استرجاع آمن</h3>
+        <p>يرجع آخر نسخة احتياطية إذا ظهر خلل بعد تجربة اللعبة.</p>
+        <button class="danger" id="restoreBtn" type="button">استعادة آخر نسخة</button>
+      </article>
+    </section>
+
+    <section class="status-grid" aria-label="حالة التعريب">
+      <article class="status-card">
+        <span class="status-card__label">اللعبة</span>
+        <strong id="gameState">...</strong>
+        <small id="gameProcess">...</small>
+      </article>
+      <article class="status-card">
+        <span class="status-card__label">التثبيت</span>
+        <strong id="packageState">...</strong>
+        <small id="packageDetail">...</small>
+      </article>
+      <article class="status-card">
+        <span class="status-card__label">الفهرس</span>
+        <strong id="checksumState">...</strong>
+        <small id="checksumDetail">...</small>
+      </article>
+      <article class="status-card">
+        <span class="status-card__label">نسبة التعريب</span>
+        <strong id="translationPercent">...</strong>
+        <small id="translationDetail">...</small>
+      </article>
+    </section>
+
+    <details class="advanced">
+      <summary>
+        <span>خيارات متقدمة</span>
+        <small>للمراجعة، فتح المجلدات، أو تنفيذ البناء والتثبيت كل واحد لوحده</small>
+      </summary>
+
+      <div class="advanced__grid">
+        <section class="tool-panel">
+          <h2>أدوات منفصلة</h2>
+          <div class="actions">
+            <button id="buildBtn" type="button">بناء الحزمة فقط</button>
+            <button id="installBtn" type="button">تثبيت آخر حزمة جاهزة</button>
+          </div>
+
+          <h2>المجلدات</h2>
+          <div class="path-list">
+            <button data-open="workspace" type="button">مجلد المشروع</button>
+            <button data-open="maindata" type="button">مجلد maindata</button>
+            <button data-open="package" type="button">الحزمة الجاهزة</button>
+            <button data-open="backups" type="button">النسخ الاحتياطية</button>
+            <button data-open="payload" type="button">ملفات الترجمة</button>
+          </div>
+
+          <dl class="facts">
+            <div><dt>قاعدة الملفات</dt><dd id="fileDbName">...</dd></div>
+            <div><dt>آخر نسخة احتياطية</dt><dd id="backupInfo">...</dd></div>
+            <div><dt>ملفات ناقصة</dt><dd id="missingInfo">...</dd></div>
+          </dl>
+        </section>
+
+        <section class="log-panel">
+          <h2>سجل التنفيذ</h2>
+          <pre id="logBox" class="log-box">جاهز. أغلق اللعبة قبل التثبيت.</pre>
+        </section>
+      </div>
+    </details>
+  </main>
+
+  <script src="renderer.js"></script>
+</body>
+</html>
