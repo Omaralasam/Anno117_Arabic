@@ -5,9 +5,7 @@
 
 ## التحميل المباشر
 
-حمّل النسخة الجاهزة من هنا:
-
-[Anno117_Arabic_v1.0.3.zip](https://github.com/Omaralasam/Anno117_Arabic/releases/download/v1.0.3/Anno117_Arabic_v1.0.3.zip)
+التحميل متوقف مؤقتًا إلى حين تجهيز النسخة القادمة.
 
 ## التحميل والتشغيل
 
